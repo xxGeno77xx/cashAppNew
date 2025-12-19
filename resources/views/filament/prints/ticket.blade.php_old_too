@@ -1,0 +1,165 @@
+@php
+    use App\Models\Client;
+    use App\Models\Produit;
+
+    $client = Client::find($commande->client_id);
+
+    $total = 0;
+    foreach ($commande->details as $produit) {
+        $total += $produit['sous_total'];
+    }
+@endphp
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket de caisse</title>
+    <style>
+        @page {
+            size: 70mm auto; /* largeur du papier */
+            margin: 0;
+        }
+
+        body {
+            font-family: monospace;
+            font-size: 9px; /* 🔹 taille réduite */
+            width: 66mm; /* 🔹 largeur utile pour éviter débordement */
+            margin-left: 0; /* collé au bord gauche */
+            margin-right: 4mm; /* petite marge à droite */
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .ticket-container {
+            border: 2px dashed black;
+            padding: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .center { text-align: center; }
+        .bold { font-weight: bold; }
+
+        .ticket-box {
+            border: 1px solid black;
+            padding: 5px;
+            margin: 5px 0;
+        }
+
+        table.products {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+        }
+
+        table.products th,
+        table.products td {
+            padding: 3px 2px;
+            font-size: 9px;
+        }
+
+        table.products th {
+            border-bottom: 1px dashed #000;
+            text-align: left;
+        }
+
+        table.products td {
+            vertical-align: top;
+        }
+
+        .qty { text-align: center; width: 20px; }
+        .subtotal { text-align: right; width: 50px; }
+
+        .total {
+            margin-top: 6px;
+            border-top: 1px solid black;
+            padding-top: 3px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .info {
+            margin: 6px 0;
+        }
+
+        .info div {
+            margin-bottom: 3px;
+        }
+
+        .small {
+            font-size: 8px;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .highlight {
+            font-size: 14px;
+            margin: 6px 0;
+        }
+
+        .qr-code {
+            text-align: center;
+            margin-top: 6px;
+        }
+
+        @media print {
+            .ticket-container { border: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ticket-container">
+
+        <div class="center bold">FASHION HOUSE</div>
+        <div class="center">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
+
+        <p>
+            Client: {{ $client?->nom ?? '-' }} {{ $client?->prenom ?? '-' }}<br>
+            Téléphone: {{ $client?->telephone ?? '-' }}
+        </p>
+
+        <div class="ticket-box center">
+            <div class="highlight bold">Ticket de caisse N° {{ $commande->id }}</div>
+        </div>
+
+        {{-- Tableau des produits --}}
+        <table class="products">
+            <thead>
+                <tr>
+                    <th>Désignation</th>
+                    <th class="qty">Qté</th>
+                    <th class="subtotal">Sous-total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($commande->details as $produit)
+                    @php
+                        $prod = Produit::find($produit['produit_id']);
+                    @endphp
+                    <tr>
+                        <td>{{ $prod->nom ?? 'Produit inconnu' }}</td>
+                        <td class="qty">{{ $produit['quantite'] }}</td>
+                        <td class="subtotal">{{ number_format($produit['sous_total'], 0, ',', '.') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <div class="total">
+            Total : {{ number_format($total, 0, ',', '.') }} FCFA
+        </div>
+
+        <div class="info">
+            <div>Émis le : <strong>{{ now()->format('d/m/Y à H:i') }}</strong></div>
+        </div>
+
+        <div class="small">
+            Nous vous remercions pour vos achats
+        </div>
+
+    </div>
+
+</body>
+</html>

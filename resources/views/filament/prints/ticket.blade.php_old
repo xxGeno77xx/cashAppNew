@@ -1,0 +1,193 @@
+@php
+    use App\Models\Client;
+    use App\Models\Produit;
+
+    $client = Client::find($commande->client_id);
+
+    $total = 0;
+    foreach ($commande->details as $produit) {
+        $total += $produit['sous_total'];
+    }
+@endphp
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket de caisse</title>
+    <style>
+        @page {
+            size: 80mm auto;
+            margin: 0;
+        }
+
+        body {
+            font-family: monospace;
+            font-size: 12px;
+            width: 80mm;
+            margin: 0;
+            padding: 0;
+        }
+
+        .ticket-container {
+            border: 2px dashed black;
+            padding: 10px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .ticket-box {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        table.products {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table.products th,
+        table.products td {
+            padding: 4px 2px;
+            font-size: 12px;
+        }
+
+        table.products th {
+            border-bottom: 1px dashed #000;
+            text-align: left;
+        }
+
+        table.products td {
+            vertical-align: top;
+        }
+
+        .qty {
+            text-align: center;
+            width: 30px;
+        }
+
+        .subtotal {
+            text-align: right;
+            width: 70px;
+        }
+
+        .total {
+            margin-top: 10px;
+            border-top: 1px solid black;
+            padding-top: 5px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .info {
+            margin: 10px 0;
+        }
+
+        .info div {
+            margin-bottom: 5px;
+        }
+
+        .small {
+            font-size: 10px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .highlight {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .qr-code {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        @media print {
+            .ticket-container {
+                border: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ticket-container">
+
+        <div class="center bold">FASHION HOUSE</div>
+        <div class="center">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
+
+        <p>
+            Client: {{ $client?->nom ?? '-' }} {{ $client?->prenom ?? '-' }}<br>
+            Téléphone: {{ $client?->telephone ?? '-' }}
+        </p>
+
+        <div class="ticket-box center">
+            <div class="highlight bold">Ticket de caisse N° {{ $commande->id }}</div>
+        </div>
+
+        {{-- Tableau des produits --}}
+        <table class="products">
+            <thead>
+                <tr>
+                    <th>Désignation</th>
+                    <th class="qty">Qté</th>
+                    <th class="subtotal"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($commande->details as $produit)
+                    @php
+                        $prod = Produit::find($produit['produit_id']);
+                    @endphp
+                    <tr>
+                        <td>{{ $prod->nom ?? 'Produit inconnu' }}</td>
+                        <td class="qty">{{ $produit['quantite'] }}</td>
+                        <td class="subtotal">{{ number_format($produit['sous_total'], 0, ',', '.') }} </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <div class="total">
+            Total : {{ number_format($total, 0, ',', '.') }} FCFA
+        </div>
+
+        <div class="info">
+            {{-- <div>Position dans la file : <strong>#1</strong></div>
+            <div>Temps d'attente estimé : <strong>5 minutes</strong></div>
+            <div>Guichet assigné : <strong>Guichet 2</strong></div> --}}
+            <div>Émis le : <strong>{{ now()->format('d/m/Y à H:i') }}</strong></div>
+        </div>
+
+        <div class="qr-code">
+            <img src="images/tonye-ezi_marie_shop_2.png" alt="logo" width="100">
+            {{-- <div><small>Scannez ce code pour suivre votre position</small></div> --}}
+        </div>
+
+        {{-- <div class="small">
+            Instructions :<br>
+            - Conservez ce ticket<br>
+            - Écoutez l'appel de votre numéro<br>
+            - Présentez-vous au guichet indiqué
+        </div> --}}
+
+        <div class="small">
+            Nous vous remercions pour vos achats
+        </div>
+
+    </div>
+
+</body>
+</html>
