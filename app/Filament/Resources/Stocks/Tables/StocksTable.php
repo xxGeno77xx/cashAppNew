@@ -22,12 +22,18 @@ class StocksTable
     public static function configure(Table $table): Table
     {
         return $table
-        ->modifyQueryUsing(
-            fn (Builder $query) => $query->join('produits', 'produits.id', 'stocks.produit_id')
-            ->select('stocks.*', 'produits.nom as produit'))
-        ->defaultSort('nom', 'asc')
+            ->modifyQueryUsing(
+                fn(Builder $query) => $query->join('produits', 'produits.id', 'stocks.produit_id')
+                    ->select('stocks.*', 'produits.nom as produit')
+            )
+            ->defaultSort('nom', 'asc')
             ->columns([
-                TextColumn::make('produit'),
+                TextColumn::make('produit')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query
+                            ->where('nom', 'like', "%{$search}%");
+                    })
+                    ->badge(),
 
                 TextColumn::make('quantite_en_stock')
                     ->badge(),
@@ -39,25 +45,23 @@ class StocksTable
                 EditAction::make(),
 
                 Action::make('ravitailler')
-                    ->action(fn ($record, $data) => self::replenish($record, $data['valeur_a_ajouter'], StockVariationsEnums::Add()->value,
+                    ->action(fn($record, $data) => self::replenish(
+                        $record,
+                        $data['valeur_a_ajouter'],
+                        StockVariationsEnums::Add()->value,
                     ))
                     ->icon('heroicon-o-plus')
                     ->color(Color::Green)
                     ->schema([
 
-                                            TextInput::make('valeur_a_ajouter')
-                                                ->label('Valeur à ajouter au stock')
-                                                ->numeric()
-                                                ->minValue(1),
+                        TextInput::make('valeur_a_ajouter')
+                            ->label('Valeur à ajouter au stock')
+                            ->numeric()
+                             ->required()
+                            ->minValue(1), 
 
-                                            TextInput::make('current_stock_value')
-                                                ->label('Quantité actuelle en stock')
-                                                ->numeric()
-                                                ->minValue(1)
-                                                ->dehydrated(false),
-
-                                        ])
-                    ->modalHeading(fn ($record) => 'Désapprovisionner le stock de '.Produit::find($record->produit_id)->nom)
+                    ])
+                    ->modalHeading(fn($record) => 'Désapprovisionner le stock de ' . Produit::find($record->produit_id)->nom)
                     ->after(function () {
                         Notification::make('ravitaillement')
                             ->title('Ravitaillement éffectué')
@@ -68,20 +72,24 @@ class StocksTable
 
                 Action::make('desapprovisionner')
                     ->label('Désapprovisionner')
-                    ->action(fn ($record, $data) => self::replenish($record, -$data['valeur_a_retirer'], StockVariationsEnums::Sub()->value,
+                    ->action(fn($record, $data) => self::replenish(
+                        $record,
+                        -$data['valeur_a_retirer'],
+                        StockVariationsEnums::Sub()->value,
                     ))
                     ->icon('heroicon-o-minus')
                     ->color(Color::Red)
                     ->schema([
 
-                                            TextInput::make('valeur_a_retirer')
-                                                ->label('Valeur à retrancher au stock')
-                                                ->numeric()
-                                                ->minValue(1)
-                                                ->maxValue(fn ($record) => $record->quantite_en_stock - 1),
+                        TextInput::make('valeur_a_retirer')
+                            ->label('Valeur à retrancher au stock')
+                            ->numeric()
+                             ->required()
+                            ->minValue(1)
+                            ->maxValue(fn($record) => $record->quantite_en_stock - 1),
 
-                                        ])
-                    ->modalHeading(fn ($record) => 'Désapprovisionner le stock de '.Produit::find($record->produit_id)->nom)
+                    ])
+                    ->modalHeading(fn($record) => 'Désapprovisionner le stock de ' . Produit::find($record->produit_id)->nom)
                     ->after(function () {
                         Notification::make('desapprovisionnement')
                             ->title('Désapprovisionnement éffectué')
@@ -95,8 +103,6 @@ class StocksTable
                     DeleteBulkAction::make(),
                 ]),
             ]);
-
-
     }
 
     public static function replenish($record, $variationValue, $type)

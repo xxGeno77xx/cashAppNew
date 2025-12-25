@@ -38,12 +38,12 @@ class ProduitsTable
                     ->placeholder(new HtmlString('<i>Pas de descritption pour ce produit</i>'))
                     ->limit(25),
 
-                TextInputColumn::make('prix_unitaire')
+                TextColumn::make('prix_unitaire')
                     ->label('Prix unitaire (FCFA)'),
 
-                TextColumn::make('quantite')
-                    ->badge()
-                    ->label('Quantité en stock'),
+                // TextColumn::make('quantite')
+                //     ->badge()
+                //     ->label('Quantité en stock'),
             ])
             ->filters([
                 SelectFilter::make('Catégorie')
