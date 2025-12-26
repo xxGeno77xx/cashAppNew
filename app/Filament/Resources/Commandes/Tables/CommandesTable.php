@@ -14,6 +14,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Columns\Summarizers\Sum;
 
 class CommandesTable
 {
@@ -36,8 +37,8 @@ class CommandesTable
                 }),
 
             TextColumn::make('prixTotal')
-                ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.').' FCFA'),
-            // ->summarize(Sum::make()->label('Total')->formatStateUsing(fn($state) => number_format($state, 0 ,",", "."). " FCFA")),
+                ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.').' FCFA')
+              ->summarize(Sum::make()->label('Total')->formatStateUsing(fn($state) => number_format($state, 0 ,",", "."). " FCFA")),
 
             TextColumn::make('created_at')
                 ->label('Date de la commande')

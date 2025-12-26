@@ -10,6 +10,7 @@ use Filament\Support\Colors\Color;
 use Illuminate\Support\HtmlString;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ImageColumn;
@@ -53,6 +54,7 @@ class ProduitsTable
             ])
             ->recordActions([
                 EditAction::make(),
+                ViewAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -82,7 +84,7 @@ class ProduitsTable
 
                             } catch (\Exception $e) {
                                 Notification::make('attention')
-                                    ->body("Vous ne pouvez pas supprimer un produit pour lequel il existe un stock. Supprimez d'abord les stock des produits concernés!")
+                                    ->body("Vous ne pouvez pas supprimer un produit pour lequel il existe un stock. Supprimez d'abord les stock des produits concernés!". $e->getMessage())
                                     ->danger()
                                     ->send();
                             }

@@ -82,7 +82,7 @@ class CommandeForm
 
                                                 if ($get('produit_id')) {
 
-                                                    return Stock::where('produit_id', $get('produit_id'))->first()->quantite_en_stock;
+                                                    return Stock::where('produit_id', $get('produit_id'))?->first()->quantite_en_stock ?? 0;
                                                 }
 
                                                 return null;

@@ -7,8 +7,8 @@ use Filament\PanelProvider;
 use Filament\Pages\Dashboard;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
+use Filament\Pages\Auth\UserNameLogin;
 use Filament\Widgets\FilamentInfoWidget;
-use App\Filament\Resources\UserNameLogin;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -29,11 +29,13 @@ class AdminPanelProvider extends PanelProvider
              ->topbar(false)
              ->sidebarCollapsibleOnDesktop()
             ->spa(hasPrefetching: true)
+            ->globalSearch(false)
             ->id('admin')
             ->path('/')
-            ->login()
+            ->login(UserNameLogin::class)
             ->colors([
-                'primary' => Color::Blue,
+                'primary' => Color::Orange,
+                'pink' => Color::Pink,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
@@ -43,7 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
-                FilamentInfoWidget::class,
+                // FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -58,6 +60,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->brandLogo(asset('images/shopify_logo.png'))
+            ->favicon(asset('images/shopify_logo.png'))
+            ->brandLogoHeight('6rem');
     }
 }

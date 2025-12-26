@@ -61,7 +61,7 @@ class StocksTable
                             ->minValue(1), 
 
                     ])
-                    ->modalHeading(fn($record) => 'Désapprovisionner le stock de ' . Produit::find($record->produit_id)->nom)
+                    ->modalHeading(fn($record) => 'Approvisionner le stock de ' . Produit::find($record->produit_id)->nom)
                     ->after(function () {
                         Notification::make('ravitaillement')
                             ->title('Ravitaillement éffectué')
@@ -100,7 +100,7 @@ class StocksTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    // DeleteBulkAction::make(),
                 ]),
             ]);
     }

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Stocks;
 
 use BackedEnum;
 use App\Models\Stock;
+use App\Enums\RolesEnums;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -47,5 +48,13 @@ class StockResource extends Resource
             'create' => CreateStock::route('/create'),
             'edit' => EditStock::route('/{record}/edit'),
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->hasRole([
+            RolesEnums::Administrateur()->value,
+
+        ]);
     }
 }

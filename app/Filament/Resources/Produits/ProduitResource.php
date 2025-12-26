@@ -2,17 +2,18 @@
 
 namespace App\Filament\Resources\Produits;
 
-use App\Filament\Resources\Produits\Pages\CreateProduit;
+use BackedEnum;
+use App\Models\Produit;
+use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use Filament\Resources\Resource;
+use Filament\Support\Icons\Heroicon;
 use App\Filament\Resources\Produits\Pages\EditProduit;
+use App\Filament\Resources\Produits\Pages\ViewProduit;
 use App\Filament\Resources\Produits\Pages\ListProduits;
+use App\Filament\Resources\Produits\Pages\CreateProduit;
 use App\Filament\Resources\Produits\Schemas\ProduitForm;
 use App\Filament\Resources\Produits\Tables\ProduitsTable;
-use App\Models\Produit;
-use BackedEnum;
-use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Table;
 
 class ProduitResource extends Resource
 {
@@ -45,6 +46,7 @@ class ProduitResource extends Resource
             'index' => ListProduits::route('/'),
             'create' => CreateProduit::route('/create'),
             'edit' => EditProduit::route('/{record}/edit'),
+            'view' => ViewProduit::route('/{record}'),
         ];
     }
 }
