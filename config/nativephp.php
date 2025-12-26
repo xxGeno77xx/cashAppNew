@@ -154,11 +154,12 @@ return [
      * Define your own scripts to run before and after the build process.
      */
     'prebuild' => [
-        //"php artisan filament:optimize",
+        "php artisan native:migrate:fresh --seed",
+        "php artisan optimize:clear",
     ],
 
     'postbuild' => [
-       "php artisan native:migrate:fresh --seed",
+       "php artisan optimize:clear", 
        "php artisan filament:optimize",
     ],
 
